@@ -1,0 +1,69 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// 員工表
+model Employee {
+  id              String    @id @default(uuid())
+  employeeId      String   @unique
+  name            String
+  email           String?
+  phone           String?
+  department      String?
+  departmentCode  String?
+  team            String?
+  status          String   @default("在職")
+  hireDate        DateTime?
+  quitDate        DateTime?
+  notes           String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  assets          Asset[]
+  assetLogs       AssetLog[]
+}
+
+// 設備表
+model Asset {
+  id              String    @id @default(uuid())
+  assetNumber     String   @unique
+  assetType       String?
+  brand           String?
+  model           String?
+  serialNumber    String?
+  computerName    String?
+  ipAddress       String?
+  macWireless     String?
+  macWired        String?
+  status          String   @default("在用")
+  notes           String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // 關聯
+  employeeId      String?
+  employee        Employee? @relation(fields: [employeeId], references: [id])
+  assetLogs       AssetLog[]
+}
+
+// 異動記錄表
+model AssetLog {
+  id              String    @id @default(uuid())
+  assetId         String
+  employeeId      String?
+  actionType      String
+  actionDate      DateTime?
+  notes           String?
+  createdAt       DateTime @default(now())
+  
+  // 關聯
+  asset           Asset    @relation(fields: [assetId], references: [id])
+  employee        Employee? @relation(fields: [employeeId], references: [id])
+}
